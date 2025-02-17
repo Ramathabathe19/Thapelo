@@ -81,7 +81,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TOKEN_HUB }}
           base: main # The target branch
           head: Feature # The source branch
           title: "Merge Feature into Main"
