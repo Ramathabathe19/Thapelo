@@ -1,0 +1,103 @@
+name: Angular CI Pipeline
+
+on:
+  push:
+    branches:
+      - Feature # Restrict the workflow to the Feature branch only
+  pull_request:
+    branches:
+      - main # Allow pull requests targeting the main branch
+
+jobs:
+  build-angular-app:
+    name: Build Angular App
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ProjectA
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install Dependencies
+        run: npm install
+      - name: Build Angular App
+        run: npm run build --if-present
+
+  run-unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    needs: build-angular-app # Ensures tests run only after build succeeds
+    defaults:
+      run:
+        working-directory: ProjectA
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Unit Tests
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+  notify:
+    name: Send Email Notification
+    runs-on: ubuntu-latest
+    needs: [build-angular-app, run-unit-tests]
+    if: always() # Ensure the email is sent regardless of job success or failure
+    steps:
+      - name: Send Email on Success
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: andrewmasina2285@gmail.com
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ramathabathemokete@gmail.com
+          from: andrewmasina2285@gmail.com
+          subject: "Angular Component - Success"
+          body: |
+            Hi Team,
+            I’m thrilled to let you know that our Angular Component has passed successfully! 🚀 The Build and Test jobs completed without any issues.
+            Your commitment to quality and excellence is truly inspiring. With each successful pipeline, we move closer to delivering exceptional value to our users.
+
+      - name: Send Email on Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: andrewmasina2285@gmail.com
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ramathabathemokete@gmail.com
+          from: andrewmasina2285@gmail.com
+          subject: "Angular Component - Failure"
+          body: |
+            Hi Team,
+            Unfortunately, one or more jobs in the Angular Component pipeline have failed. Please review the logs for more details and take appropriate action to resolve the issue.
+            Your prompt attention to this matter will help us maintain the high standards we strive for.
+
+  create-pr:
+    name: Create PR from Feature to Main
+    runs-on: ubuntu-latest
+    needs: [build-angular-app, run-unit-tests] # Ensure this job runs only after both dependent jobs succeed
+    if: github.event_name == 'push' && needs.build-angular-app.result == 'success' && needs.run-unit-tests.result == 'success'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main # The target branch
+          head: Feature # The source branch
+          title: "Merge Feature into Main"
+          body: "This is an automated PR to merge changes from Feature into Main."
