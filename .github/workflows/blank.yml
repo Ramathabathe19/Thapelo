@@ -59,14 +59,14 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          username: andrewmasina2285@gmail.com
+          username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           to: ramathabathemokete@gmail.com
-          from: andrewmasina2285@gmail.com
+          from: ${{ secrets.EMAIL_USERNAME }}
           subject: "Angular Component - Success"
           body: |
             Hi Team,
-            I’m thrilled to let you know that our Angular Component has passed successfully! 🚀 The Build and Test jobs completed without any issues, showcasing the hard work and dedication each of you brings to the table every day.
+            I’m thrilled to let you know that our Angular Component has passed successfully! 🚀 The Build and Test jobs completed without any issues.
             Your commitment to quality and excellence is truly inspiring. With each successful pipeline, we move closer to delivering exceptional value to our users.
 
       - name: Send Email on Failure
@@ -75,10 +75,10 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          username: andrewmasina2285@gmail.com
+          username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           to: ramathabathemokete@gmail.com
-          from: andrewmasina2285@gmail.com
+          from: ${{ secrets.EMAIL_USERNAME }}
           subject: "Angular Component - Failure"
           body: |
             Hi Team,
@@ -86,10 +86,10 @@ jobs:
             Your prompt attention to this matter will help us maintain the high standards we strive for.
 
   create-pr:
-    name: Create PR from Login-Feature to Integration
+    name: Create PR from Feature to Main
     runs-on: ubuntu-latest
     needs: [build, test] # Ensure this job runs only after both build and test jobs succeed
-    if: github.ref == 'refs/heads/Login-Feature' && github.event_name == 'push' && needs.build.result == 'success' && needs.test.result == 'success'
+    if: github.ref == 'refs/heads/Feature' && github.event_name == 'push' && needs.build.result == 'success' && needs.test.result == 'success'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -98,7 +98,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: Main # The target branch
+          base: main # The target branch
           head: Feature # The source branch
-          title: "Merge Login-Feature into Integration"
-          body: "This is an automated PR to merge changes from Login-Feature into Integration."
+          title: "Merge Feature into Main"
+          body: "This is an automated PR to merge changes from Feature into Main."
