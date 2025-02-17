@@ -3,6 +3,7 @@ name: Angular CI Pipeline
 on:
   push:
     branches:
+      - main
       - Feature # Restrict the workflow to the Feature branch only
   pull_request:
     branches:
