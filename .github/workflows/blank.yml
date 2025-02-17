@@ -3,11 +3,10 @@ name: Angular CI Pipeline
 on:
   push:
     branches:
-      - main
-      - Feature
+      - Feature # Restrict the workflow to the Feature branch only
   pull_request:
     branches:
-      - main
+      - main # Allow pull requests targeting the main branch
 
 jobs:
   build-angular-app:
@@ -57,12 +56,12 @@ jobs:
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com # Replace with your SMTP server address
-          server_port: 587 # Replace with your SMTP server port
-          username: andrewmasina2285@gmail.com # Replace with your SMTP username
-          password: ${{ secrets.SMTP_PASSWORD }} # Store your SMTP password in GitHub Secrets
-          to: ramathabathemokete@gmail.com # Replace with the recipient's email address
-          from: andrewmasina2285@gmail.com # Replace with the sender's email address
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: andrewmasina2285@gmail.com
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ramathabathemokete@gmail.com
+          from: andrewmasina2285@gmail.com
           subject: "Angular Component - Success"
           body: |
             Hi Team,
@@ -73,12 +72,12 @@ jobs:
         if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com # Replace with your SMTP server address
-          server_port: 587 # Replace with your SMTP server port
-          username: andrewmasina2285@gmail.com # Replace with your SMTP username
-          password: ${{ secrets.SMTP_PASSWORD }} # Store your SMTP password in GitHub Secrets
-          to: ramathabathemokete@gmail.com # Replace with the recipient's email address
-          from: andrewmasina2285@gmail.com # Replace with the sender's email address
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: andrewmasina2285@gmail.com
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ramathabathemokete@gmail.com
+          from: andrewmasina2285@gmail.com
           subject: "Angular Component - Failure"
           body: |
             Hi Team,
@@ -89,7 +88,7 @@ jobs:
     name: Create PR from Feature to Main
     runs-on: ubuntu-latest
     needs: [build-angular-app, run-unit-tests] # Ensure this job runs only after both dependent jobs succeed
-    if: github.ref == 'refs/heads/Feature' && github.event_name == 'push' && needs.build-angular-app.result == 'success' && needs.run-unit-tests.result == 'success'
+    if: github.event_name == 'push' && needs.build-angular-app.result == 'success' && needs.run-unit-tests.result == 'success'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -97,8 +96,8 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          token: ${{ secrets.TOKEN_HUB }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           base: main # The target branch
           head: Feature # The source branch
           title: "Merge Feature into Main"
-          body: "This is an automated PR to merge changes From Feature into Main."
+          body: "This is an automated PR to merge changes from Feature into Main."
