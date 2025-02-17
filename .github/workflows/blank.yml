@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-angular-app:
     name: Build Angular App
     runs-on: ubuntu-latest
     defaults:
@@ -28,10 +28,10 @@ jobs:
       - name: Build Angular App
         run: npm run build --if-present
 
-  test:
+  run-unit-tests:
     name: Run Unit Tests
     runs-on: ubuntu-latest
-    needs: build # Ensures tests run only after build succeeds
+    needs: build-angular-app # Ensures tests run only after build succeeds
     defaults:
       run:
         working-directory: ProjectA
@@ -50,30 +50,46 @@ jobs:
   notify:
     name: Send Email Notification
     runs-on: ubuntu-latest
-    needs: [build, test] # Ensure this job runs after both build and test jobs
-    if: always() # Always run this job regardless of success or failure
+    needs: [build-angular-app, run-unit-tests]
+    if: always() # Ensure the email is sent regardless of job success or failure
     steps:
-      - name: Send Success Email
-        if: needs.build.result == 'success' && needs.test.result == 'success'
+      - name: Send Email on Success
+        if: success()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          from: ${{ secrets.EMAIL_USERNAME }}
-          to: ramathabathemokete@gmail.com
+          server_address: smtp.gmail.com # Replace with your SMTP server address
+          server_port: 587 # Replace with your SMTP server port
+          username: andrewmasina2285@gmail.com # Replace with your SMTP username
+          password: ${{ secrets.SMTP_PASSWORD }} # Store your SMTP password in GitHub Secrets
+          to: ramathabathemokete@gmail.com # Replace with the recipient's email address
+          from: andrewmasina2285@gmail.com # Replace with the sender's email address
           subject: "Angular Component - Success"
           body: |
             Hi Team,
             I’m thrilled to let you know that our Angular Component has passed successfully! 🚀 The Build and Test jobs completed without any issues.
             Your commitment to quality and excellence is truly inspiring. With each successful pipeline, we move closer to delivering exceptional value to our users.
 
+      - name: Send Email on Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com # Replace with your SMTP server address
+          server_port: 587 # Replace with your SMTP server port
+          username: andrewmasina2285@gmail.com # Replace with your SMTP username
+          password: ${{ secrets.SMTP_PASSWORD }} # Store your SMTP password in GitHub Secrets
+          to: ramathabathemokete@gmail.com # Replace with the recipient's email address
+          from: andrewmasina2285@gmail.com # Replace with the sender's email address
+          subject: "Angular Component - Failure"
+          body: |
+            Hi Team,
+            Unfortunately, one or more jobs in the Angular Component pipeline have failed. Please review the logs for more details and take appropriate action to resolve the issue.
+            Your prompt attention to this matter will help us maintain the high standards we strive for.
+
   create-pr:
     name: Create PR from Feature to Main
     runs-on: ubuntu-latest
-    needs: [build, test] # Ensure this job runs only after both build and test jobs succeed
-    if: github.ref == 'refs/heads/Feature' && github.event_name == 'push' && needs.build.result == 'success' && needs.test.result == 'success'
+    needs: [build-angular-app, run-unit-tests] # Ensure this job runs only after both dependent jobs succeed
+    if: github.ref == 'refs/heads/Feature' && github.event_name == 'push' && needs.build-angular-app.result == 'success' && needs.run-unit-tests.result == 'success'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -81,7 +97,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          token: ${{ secrets.TOKEN_HUB }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           base: main # The target branch
           head: Feature # The source branch
           title: "Merge Feature into Main"
