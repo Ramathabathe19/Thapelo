@@ -53,7 +53,7 @@ jobs:
     needs: [build, test] # Ensure this job runs after both build and test jobs
     if: always() # Always run this job regardless of success or failure
     steps:
-      - name: Send Email on Success
+      - name: Send Success Email
         if: needs.build.result == 'success' && needs.test.result == 'success'
         uses: dawidd6/action-send-mail@v3
         with:
@@ -68,22 +68,6 @@ jobs:
             Hi Team,
             I’m thrilled to let you know that our Angular Component has passed successfully! 🚀 The Build and Test jobs completed without any issues.
             Your commitment to quality and excellence is truly inspiring. With each successful pipeline, we move closer to delivering exceptional value to our users.
-
-      - name: Send Email on Failure
-        if: needs.build.result != 'success' || needs.test.result != 'success'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          to: ramathabathemokete@gmail.com
-          from: ${{ secrets.EMAIL_USERNAME }}
-          subject: "Angular Component - Failure"
-          body: |
-            Hi Team,
-            Unfortunately, one or more jobs in the Angular Component pipeline have failed. Please review the logs for more details and take appropriate action to resolve the issue.
-            Your prompt attention to this matter will help us maintain the high standards we strive for.
 
   create-pr:
     name: Create PR from Feature to Main
