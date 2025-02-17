@@ -101,4 +101,4 @@ jobs:
           base: main # The target branch
           head: Feature # The source branch
           title: "Merge Feature into Main"
-          body: "This is an automated PR to merge changes from Feature into Main."
+          body: "This is an automated PR to merge changes From Feature into Main."
