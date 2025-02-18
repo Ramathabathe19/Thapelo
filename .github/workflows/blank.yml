@@ -59,10 +59,10 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          username: andrewmasina2285@gmail.com
+          username: ramathabathemokete@gmail.com
           password: ${{ secrets.SMTP_PASSWORD }}
-          to: ramathabathemokete@gmail.com
-          from: andrewmasina2285@gmail.com
+          to: andrewmasin2285@gmail.com
+          from: ramathabathemokete@gmail.com
           subject: "Angular Component - Success"
           body: |
             Hi Team,
@@ -75,10 +75,10 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          username: andrewmasina2285@gmail.com
+          username: ramathabathemokete@gmail.com
           password: ${{ secrets.SMTP_PASSWORD }}
-          to: ramathabathemokete@gmail.com
-          from: andrewmasina2285@gmail.com
+          to: andrewmasina2285@gmail.com
+          from: ramathabathemokete@gmail.com
           subject: "Angular Component - Failure"
           body: |
             Hi Team,
