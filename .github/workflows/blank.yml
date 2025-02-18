@@ -66,7 +66,7 @@ jobs:
           subject: "Angular Component - Success"
           body: |
             Hi Team,
-            I’m thrilled to let you know that our Angular Component has passed successfully! 🚀 The Build and Test jobs completed without any issues.
+            I’m thrilled to let YOU know that our Angular Component has passed successfully! 🚀 The Build and Test jobs completed without any issues.
             Your commitment to quality and excellence is truly inspiring. With each successful pipeline, we move closer to delivering exceptional value to our users.
 
       - name: Send Email on Failure
